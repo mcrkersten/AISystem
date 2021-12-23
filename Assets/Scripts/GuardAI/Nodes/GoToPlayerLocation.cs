@@ -8,13 +8,10 @@ public class GoToPlayerLocation : Node
 {
     private NavMeshAgent agent;
     private GuardManager guard;
-    private Transform target;
-    private LayerMask layerMask;
-    public GoToPlayerLocation(NavMeshAgent agent, Transform target, LayerMask layerMask)
+
+    public GoToPlayerLocation(NavMeshAgent agent, Transform target)
     {
         this.agent = agent;
-        this.layerMask = layerMask;
-        this.target = target;
         guard = agent.GetComponent<GuardManager>();
     }
 
@@ -45,12 +42,11 @@ public class GoToPlayerLocation : Node
         if(Vector3.Distance(agent.transform.position, playerTransform.position) < weapon.range)
         {
             agent.isStopped = false;
-            guard.state = GuardManager.GuardState.GoToPlayer;
             state = NodeState.FAILURE;
         }
         else
         {
-            Debug.Log("Go to player");
+            guard.SetState(GuardManager.GuardState.GoToPlayer);
             state = NodeState.RUNNING;
         }
 

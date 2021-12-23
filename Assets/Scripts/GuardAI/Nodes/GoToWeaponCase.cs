@@ -15,28 +15,33 @@ public class GoToWeaponCase : Node
 
     public override NodeState Evaluate()
     {
+        object wc = GetData("WeaponCase");
         object w = GetData("Weapon");
+
         if (w != null)//We have weapon
         {
-            state = NodeState.SUCCESS;
+            state = NodeState.FAILURE;
             return state;
         }
 
-        object wc = GetData("WeaponCase");
-        if(wc != null)//We found weaponCase
+        if(wc == null)
         {
-            WeaponCase target = (WeaponCase)GetData("WeaponCase");
-            agent.destination = target.TargetPosition.transform.position;
-            if (!agent.pathPending && agent.remainingDistance < 0.2f)
-            {
-                state = NodeState.SUCCESS;
-            }
-            else
-            {
-                agent.GetComponent<GuardManager>().state = GuardManager.GuardState.GoForWeapon;
-                state = NodeState.RUNNING;
-            }
+            state = NodeState.FAILURE;
+            return state;
         }
+
+        WeaponCase target = (WeaponCase)GetData("WeaponCase");
+        agent.destination = target.TargetPosition.transform.position;
+        if (Vector3.Distance(agent.transform.position, target.TargetPosition.position) < 0.2f)
+        {
+            state = NodeState.SUCCESS;
+        }
+        else
+        {
+            agent.GetComponent<GuardManager>().SetState(GuardManager.GuardState.GoForWeapon);
+            state = NodeState.RUNNING;
+        }
+
         return state;
     }
 }

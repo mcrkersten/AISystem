@@ -4,9 +4,9 @@ using UnityEngine;
 
 public abstract class Tree : MonoBehaviour
 {
-    private Node root = null;
+    protected Node root = null;
 
-    protected void Start()
+    protected virtual void Start()
     {
         root = SetupTree();
     }

@@ -16,6 +16,7 @@ public class ReturnToWeaponCase : Node
         object wc = GetData("WeaponCase");
         object w = GetData("Weapon");
         object p = GetData("Player");
+        object lp = GetData("LastPosition");
 
         if (wc == null)
         {
@@ -30,7 +31,7 @@ public class ReturnToWeaponCase : Node
             return state;
         }
 
-        if (p != null)
+        if (p != null || lp != null)
         {
             state = NodeState.FAILURE;
             return state;
@@ -39,17 +40,17 @@ public class ReturnToWeaponCase : Node
         WeaponCase weaponCase = (WeaponCase)wc;
         agent.destination = weaponCase.TargetPosition.transform.position;
 
-        if (!agent.pathPending && agent.remainingDistance < 0.2f)
+        if (Vector3.Distance(agent.transform.position, weaponCase.TargetPosition.transform.position) < .2f)
         {
             agent.autoBraking = true;
             state = NodeState.FAILURE;
         }
         else
         {
-            agent.GetComponent<GuardManager>().state = GuardManager.GuardState.ReturnWeapon;
+            agent.isStopped = false;
+            agent.GetComponent<GuardManager>().SetState(GuardManager.GuardState.ReturnWeapon);
             state = NodeState.RUNNING;
         }
-
         return state;
     }
 }

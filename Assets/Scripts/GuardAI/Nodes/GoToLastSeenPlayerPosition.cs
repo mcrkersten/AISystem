@@ -3,18 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class GoToLastKnownPlayerPosition : Node
+public class GoToLastSeenPlayerPosition : Node
 {
     private NavMeshAgent agent;
     private GuardManager guard;
-    private Transform target;
-    private LayerMask layerMask;
 
-    public GoToLastKnownPlayerPosition(NavMeshAgent agent, Transform target, LayerMask layerMask)
+    public GoToLastSeenPlayerPosition(NavMeshAgent agent, Transform target)
     {
         this.agent = agent;
-        this.layerMask = layerMask;
-        this.target = target;
         guard = agent.GetComponent<GuardManager>();
     }
 
@@ -22,14 +18,6 @@ public class GoToLastKnownPlayerPosition : Node
     {
         object w = GetData("Weapon");
         object lp = GetData("LastPosition");
-        object p = GetData("Player");
-
-        //No need to go to last position
-        if(p != null)
-        {
-            state = NodeState.FAILURE;
-            return state;
-        }
 
         //No Player to attack
         if (lp == null)
@@ -52,13 +40,14 @@ public class GoToLastKnownPlayerPosition : Node
         if (Vector3.Distance(agent.transform.position, position) < .2f)
         {
             ClearData("LastPosition");
+            guard.lastPositionLineRenderer.enabled = false;
             state = NodeState.FAILURE;
             agent.autoBraking = true;
         }
         else
         {
             agent.isStopped = false;
-            guard.state = GuardManager.GuardState.GoToLastKnowLocation;
+            guard.SetState(GuardManager.GuardState.GoToLastKnowLocation);
             state = NodeState.RUNNING;
         }
         

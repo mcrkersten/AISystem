@@ -9,11 +9,13 @@ public class Patrol : Node
     private Transform[] waypoints;
     private int destPoint = 0;
     private NavMeshAgent agent;
+    private GuardManager guardManager;
 
     public Patrol(NavMeshAgent agent, Transform[] waypoints)
     {
         this.waypoints = waypoints;
         this.agent = agent;
+        guardManager = agent.GetComponent<GuardManager>();
         GotoNextPoint();
     }
 
@@ -34,12 +36,16 @@ public class Patrol : Node
 
     public override NodeState Evaluate()
     {
-        if (!agent.pathPending && agent.remainingDistance < 0.2f)
-            GotoNextPoint();
+        if (!guardManager.blindedBySmoke)
+        {
+            if (!agent.pathPending && agent.remainingDistance < 0.2f)
+                GotoNextPoint();
 
-        state = NodeState.RUNNING;
-        agent.GetComponent<GuardManager>().state = GuardManager.GuardState.Patrol;
-        agent.autoBraking = false;
+            state = NodeState.RUNNING;
+            guardManager.SetState(GuardManager.GuardState.Patrol);
+            guardManager.lastPositionLineRenderer.enabled = false;
+            agent.autoBraking = false;
+        }
         return state;
     }
 }

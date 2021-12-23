@@ -20,7 +20,6 @@ public class ReturnWeapon : Node
         object wc = GetData("WeaponCase");
         object p = GetData("Player");
 
-
         //We have no weapon
         if (w == null)
         {
@@ -42,14 +41,14 @@ public class ReturnWeapon : Node
 
         weapon = (Weapon)w;
         weaponCase = (WeaponCase)wc;
-        if (!agent.pathPending && Vector3.Distance(agent.transform.position, weaponCase.TargetPosition.transform.position) < .2f)
+        if (Vector3.Distance(agent.transform.position, weaponCase.TargetPosition.transform.position) < .2f)
         {
             weaponCase.ReturnWeapon(weapon);
             ClearData("Weapon");
+            ClearData("WeaponCase");
             state = NodeState.SUCCESS;
             return state;
         };
-
         state = NodeState.FAILURE;
         return state;
     }

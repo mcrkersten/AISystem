@@ -27,7 +27,6 @@ public class WeaponCase : MonoBehaviour
 
     public void ReturnWeapon(Weapon weapon)
     {
-        Debug.Log(weapon);
         for (int i = 0; i < weapons.Length; i++)
         {
             if(weapons[i] == null)

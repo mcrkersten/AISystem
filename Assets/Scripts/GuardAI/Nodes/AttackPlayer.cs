@@ -8,12 +8,10 @@ public class AttackPlayer : Node
     private NavMeshAgent agent;
     private GuardManager guard;
     private Transform target;
-    private LayerMask layerMask;
 
-    public AttackPlayer(NavMeshAgent agent, Transform target, LayerMask layerMask)
+    public AttackPlayer(NavMeshAgent agent, Transform target)
     {
         this.agent = agent;
-        this.layerMask = layerMask;
         this.target = target;
         this.guard = agent.GetComponent<GuardManager>();
     }
@@ -37,13 +35,13 @@ public class AttackPlayer : Node
             return state;
         }
 
-
         if (CanSeePlayer())
         {
-            if (agent.remainingDistance < guard.weapon.range)
+            if (Vector3.Distance(target.position, agent.transform.position) < guard.weapon.range)
             {
+                FaceTarget(target.position);
                 agent.isStopped = true;
-                guard.state = GuardManager.GuardState.AttackPlayer;
+                guard.SetState(GuardManager.GuardState.AttackPlayer);
                 guard.FireWeapon();
                 state = NodeState.SUCCESS;
                 return state;
@@ -60,11 +58,22 @@ public class AttackPlayer : Node
         Vector3 direction = target.position - agent.transform.position;
         Debug.DrawRay(agent.transform.position, direction, Color.cyan);
         // Does the ray intersect any objects excluding the player layer
-        if (Physics.Raycast(agent.transform.position, direction, out hit, Mathf.Infinity, layerMask))
+        if (Physics.Raycast(agent.transform.position, direction, out hit, Mathf.Infinity))
         {
-            return true;
+            if (hit.transform.CompareTag("Player"))
+            {
+                return true;
+            }
         }
 
         return false;
+    }
+
+    private void FaceTarget(Vector3 destination)
+    {
+        Vector3 lookPos = destination - agent.transform.position;
+        lookPos.y = 0;
+        Quaternion rotation = Quaternion.LookRotation(lookPos);
+        agent.transform.rotation = Quaternion.Slerp(agent.transform.rotation, rotation, .5f);
     }
 }

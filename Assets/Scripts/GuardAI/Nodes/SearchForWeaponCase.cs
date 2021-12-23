@@ -18,9 +18,10 @@ public class SearchForWeaponCase : Node
         object wc = GetData("WeaponCase");
         object w = GetData("Weapon");
         object p = GetData("Player");
+        object lp = GetData("LastPosition");
 
         //No Player to attack
-        if(p == null)
+        if (p == null && lp == null)
         {
             state = NodeState.FAILURE;
             return state;
@@ -45,7 +46,7 @@ public class SearchForWeaponCase : Node
         if (closestCase != null)
         {
             state = NodeState.SUCCESS;
-            parent.parent.SetData("WeaponCase", closestCase);
+            parent.parent.parent.SetData("WeaponCase", closestCase);
         }
         else
         {
